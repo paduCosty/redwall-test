@@ -52,7 +52,6 @@ class CoinController extends Controller
         $values = $data['values'];
 
         $crypto = $this->client->coins()->getCoin($request->id);
-// dd($crypto);
         return view('coin.details', compact('crypto', 'years', 'values', 'filters'));
     }
 
