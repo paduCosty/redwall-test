@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
 
 
-class CryptoController extends Controller
+class CoinController extends Controller
 {
     private $client;
 
@@ -24,7 +24,7 @@ class CryptoController extends Controller
             'page' => 1,
         ]);
 
-        return view('crypto.list', ['cryptos' =>  $cryptos]);
+        return view('coin.list', ['cryptos' =>  $cryptos]);
     }
 
     public function show(Request $request)
@@ -52,8 +52,8 @@ class CryptoController extends Controller
         $values = $data['values'];
 
         $crypto = $this->client->coins()->getCoin($request->id);
-
-        return view('crypto.details', compact('crypto', 'years', 'values', 'filters'));
+// dd($crypto);
+        return view('coin.details', compact('crypto', 'years', 'values', 'filters'));
     }
 
     private function processChartData($prices, $frequency)
@@ -96,7 +96,6 @@ class CryptoController extends Controller
                         $labels[] = $year;
                         $values[] = $price[1];
                     }
-
                 }
         }
 
@@ -106,11 +105,4 @@ class CryptoController extends Controller
         ];
     }
 
-
-    public function show1(Request $request)
-    {
-        $client = new CoinGeckoClient();
-        $crypto = $client->coins()->getCoin($request->id);
-        return  $crypto;
-    }
 }
