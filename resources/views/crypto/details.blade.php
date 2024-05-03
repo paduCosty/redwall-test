@@ -54,11 +54,12 @@
 
             <div class="col-md-3">
                 <select name="frequency" class="form-control">
-                    <option value="daily">Zilnic</option>
-                    <option value="weekly">Săptămânal</option>
-                    <option value="monthly">Lunar</option>
-                    <option value="yearly">Anual</option>
+                    <option value="" {{ $filters['frequency'] === '' ? 'selected' : '' }}>Default</option>
+                    <option value="weekly" {{ $filters['frequency'] === 'weekly' ? 'selected' : '' }}>weekly</option>
+                    <option value="monthly" {{ $filters['frequency'] === 'monthly' ? 'selected' : '' }}>Monthley</option>
+                    <option value="yearly" {{ $filters['frequency'] === 'yearly' ? 'selected' : '' }}>Yearly</option>
                 </select>
+
             </div>
 
             <div class="">

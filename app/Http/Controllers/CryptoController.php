@@ -32,7 +32,7 @@ class CryptoController extends Controller
         $startDate = $request->start_date ?? date('Y-m-d', strtotime('-1 year', strtotime(date('Y-m-d'))));
         $endDate = $request->end_date ?? date('Y-m-d');
 
-        $frequency = $request->frequency ?? 'daily';
+        $frequency = $request->frequency;
 
         $filters = [
             'start_date' => $startDate,
@@ -61,10 +61,8 @@ class CryptoController extends Controller
         $labels = [];
         $values = [];
 
-        // Procesați datele în funcție de frecvența selectată
         switch ($frequency) {
             case 'yearly':
-                // Procesare pentru fiecare an
                 foreach ($prices as $price) {
                     $year = date('Y', $price[0] / 1000);
                     if (!in_array($year, $labels)) {
@@ -74,7 +72,6 @@ class CryptoController extends Controller
                 }
                 break;
             case 'monthly':
-                // Procesare pentru fiecare lună
                 foreach ($prices as $price) {
                     $month = date('F Y', $price[0] / 1000);
                     if (!in_array($month, $labels)) {
@@ -84,7 +81,6 @@ class CryptoController extends Controller
                 }
                 break;
             case 'weekly':
-                // Procesare pentru fiecare săptămână
                 foreach ($prices as $price) {
                     $week = 'Week ' . date('W', $price[0] / 1000) . ', ' . date('Y', $price[0] / 1000);
                     if (!in_array($week, $labels)) {
@@ -93,6 +89,15 @@ class CryptoController extends Controller
                     }
                 }
                 break;
+            default:
+                foreach ($prices as $price) {
+                    $year = date('d:m:Y', $price[0] / 1000);
+                    if (!in_array($year, $labels)) {
+                        $labels[] = $year;
+                        $values[] = $price[1];
+                    }
+
+                }
         }
 
         return [
