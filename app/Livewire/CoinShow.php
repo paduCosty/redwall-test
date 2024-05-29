@@ -1,40 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Livewire;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
+use Livewire\Component;
 
-
-class CoinController extends Controller
+class CoinShow extends Component
 {
-    private $client;
+    public $coin;
+    public $filters = [];
+    public $years;
+    public $values;
 
-    public function __construct()
+    public function mount($id, $start_date = null, $end_date = null, $frequency = null)
     {
-        $this->client = new CoinGeckoClient();
-    }
+        $startDate = request()->start_date ?? date('Y-m-d', strtotime('-1 year', strtotime(date('Y-m-d'))));
+        $endDate = request()->end_date ?? date('Y-m-d');
 
-    public function index()
-    {
-        $cryptos = $this->client->coins()->getMarkets('usd', [
-            'order' => 'market_cap_desc',
-            'per_page' => 100,
-            'page' => 1,
-        ]);
-
-        return view('coin.list', ['cryptos' =>  $cryptos]);
-    }
-
-    public function show(Request $request)
-    {
-        $startDate = $request->start_date ?? date('Y-m-d', strtotime('-1 year', strtotime(date('Y-m-d'))));
-        $endDate = $request->end_date ?? date('Y-m-d');
-
-        $frequency = $request->frequency;
-
-        $filters = [
+        $frequency = request()->frequency ?? '';
+        $this->filters = [
             'start_date' => $startDate,
             'end_date' => $endDate,
             'frequency' => $frequency,
@@ -43,16 +27,21 @@ class CoinController extends Controller
         $startDateUnix = strtotime($startDate);
         $endDateUnix = strtotime($endDate);
 
-        $response = $this->client->coins()->getMarketChartRange($request->id, 'usd', $startDateUnix, $endDateUnix);
+        $client = new CoinGeckoClient();
+        $response = $client->coins()->getMarketChartRange($id, 'usd', $startDateUnix, $endDateUnix);
         $prices = $response['prices'];
 
         $data = $this->processChartData($prices, $frequency);
 
-        $years = $data['labels'];
-        $values = $data['values'];
+        $this->years = $data['labels'];
+        $this->values = $data['values'];
 
-        $crypto = $this->client->coins()->getCoin($request->id);
-        return view('coin.details', compact('crypto', 'years', 'values', 'filters'));
+        $this->coin = $client->coins()->getCoin($id);
+    }
+
+    public function render()
+    {
+        return view('livewire.coin-show');
     }
 
     private function processChartData($prices, $frequency)
@@ -103,5 +92,4 @@ class CoinController extends Controller
             'values' => $values,
         ];
     }
-
 }
